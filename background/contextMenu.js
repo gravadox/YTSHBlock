@@ -1,6 +1,6 @@
 // read addon options
 let addonOptions;
-const optionList = ["nav", "homefeed", "channel", "subs", "menu"];
+const optionList = ["nav", "homefeed", "channel", "subs", "menu", "searchshorts", "watchshorts"];
 
 browser.storage.local
   .get(optionList)
@@ -18,6 +18,8 @@ browser.storage.local
         channel: true,
         subs: true,
         menu: true,
+        searchshorts: true,
+        watchshorts: true,
       };
       browser.storage.local.set(addonOptions);
     } else addonOptions = options;
@@ -93,6 +95,28 @@ function createContextMenu() {
       title: "Hide Shorts from Subscriptions page",
       contexts: ["all"],
       checked: addonOptions.subs,
+    },
+    onCreated
+  );
+
+  browser.menus.create(
+    {
+      id: "check-searchshort",
+      type: "checkbox",
+      title: "Hide Shorts in Search results",
+      contexts: ["all"],
+      checked: addonOptions.searchshort,
+    },
+    onCreated
+  );
+
+  browser.menus.create(
+    {
+      id: "check-watchshort",
+      type: "checkbox",
+      title: "Hide Shorts in Watch page",
+      contexts: ["all"],
+      checked: addonOptions.watchshort,
     },
     onCreated
   );

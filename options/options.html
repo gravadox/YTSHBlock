@@ -5,7 +5,11 @@
     <link rel="stylesheet" type="text/css" href="options.css">
   </head>
   <body>
-    <h1 class="ml">Options</h1>
+    <div style="margin: 0px;">
+    <h3 style="margin: 0px;">Options</h3>
+    <div class="seperator"></div>
+
+    </div>
     <form>
       <ul class="checkbox-list">
         <li>
@@ -28,8 +32,17 @@
           <input type="checkbox" id="menu" name="menu" />
           <label for="menu">Enable context menu</label>
         </li>
+        <li>
+          <input type="checkbox" id="searchshorts" name="searchshorts" />
+          <label for="searchshorts">Hide search shorts</label>
+        </li>
+        <li>
+          <input type="checkbox" id="watchshorts" name="watchshorts" />
+          <label for="watchshorts">Hide watch shorts</label>
+        </li>
+
       </ul>
-      <button class="mt ml" type="submit">Save</button>
+      <button class="saveButton" type="submit">Save</button>
     </form>
     <div id="saved-label">Options saved</div>
     <script src="options.js"></script>
