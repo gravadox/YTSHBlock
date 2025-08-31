@@ -1,23 +1,26 @@
-function handleUpdated(tabId, changeInfo, tabInfo) {
-  if (changeInfo.url) {
-    // if url matches YouTube Shorts url format,
-    const re =
-      /(?:http|https):\/\/www.youtube.com\/shorts\/([a-zA-Z0-9_-]{11})/;
-    const found = changeInfo.url.match(re);
-    if (found[1]) {
-      // redirect url to original YouTube video player
-      browser.tabs
-        .update(tabId, {
-          url: `https://www.youtube.com/watch?v=${found[1]}`,
-          loadReplace: true,
-        })
-        .then(console.log("Redirecting Shorts..."))
-        .catch(console.error);
+async function handleUpdated(tabId, changeInfo, tab) {
+  if (!changeInfo.url) return;
+
+  // Match YouTube Shorts URLs
+  const re = /(?:http|https):\/\/www.youtube.com\/shorts\/([a-zA-Z0-9_-]{11})/;
+  const found = changeInfo.url.match(re);
+
+  if (found && found[1]) {
+    const redirectUrl = `https://www.youtube.com/watch?v=${found[1]}`;
+
+    try {
+      await browser.tabs.update(tabId, {
+        url: redirectUrl,
+        loadReplace: true
+      });
+      console.log("Redirecting Shorts...", redirectUrl);
+    } catch (err) {
+      console.error("Failed to redirect Shorts:", err);
     }
   }
 }
 
-// listen to url changes
+// Listen to URL changes
 browser.tabs.onUpdated.addListener(handleUpdated, {
   urls: ["*://www.youtube.com/shorts/*"],
 });
