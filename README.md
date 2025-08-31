@@ -1,7 +1,7 @@
 
 ## <img alt="Icon" width="21" src="https://raw.githubusercontent.com/gravadox/YTSHBlock/refs/heads/main/icons/icon-96.png" style="max-width: 100%;"> YTSHBlock
 
-Removes YouTube shorts, forked from 
+Removes YouTube shorts,
 **options**:
 -   Hide Shorts tab in navigation tab
 -   Hide Shorts section in Home feed
