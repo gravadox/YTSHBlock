@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>YTSHBlock — Settings</title>
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    html, body { height: 100%; }
+    .page { display: flex; height: 100vh; overflow: hidden; }
+
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex; flex-direction: column;
+      padding: 20px 14px;
+    }
+    .sb-logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 20px; }
+    .sb-logo .name { font-size: 16px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+    .sb-logo .sub  { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+    .nav { display: flex; flex-direction: column; gap: 2px; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 11px; border-radius: 10px;
+      border: none; cursor: pointer; text-align: left; width: 100%;
+      font-family: var(--font-ui); font-size: 13.5px; font-weight: 500;
+      letter-spacing: -.01em; background: transparent; color: var(--text-2);
+      transition: all .14s var(--ease);
+    }
+    .nav-btn:hover  { color: var(--text); background: var(--surface-2); }
+    .nav-btn.active { background: var(--surface-3); color: var(--text); }
+    .nav-btn.active .ni { color: var(--text); }
+    .ni { color: var(--text-3); flex-shrink: 0; display: flex; }
+
+    .sb-footer {
+      margin-top: auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4px;
+    }
+    .sb-footer span { font-size: 11.5px; color: var(--text-3); }
+
+    .content { flex: 1; overflow-y: auto; padding: 40px 48px 60px; }
+
+    .panel { display: none; max-width: 600px; margin: 0 auto; }
+    .panel.active { display: block; animation: fadeUp .22s var(--ease) both; }
+
+    .ph { margin-bottom: 26px; }
+    .ph h1 { font-size: 24px; font-weight: 700; letter-spacing: -.025em; margin: 0; }
+    .ph p  { font-size: 14px; color: var(--text-2); margin: 7px 0 0; line-height: 1.5; max-width: 480px; }
+
+    .chart { display: flex; align-items: flex-end; gap: 10px; height: 130px; }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+    .chart-bar { width: 100%; border-radius: 5px; }
+    .chart-bar.hi { background: var(--on-bg); }
+    .chart-bar.lo { background: var(--track); }
+    .chart-val { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); letter-spacing: -.02em; flex-shrink: 0; }
+    .chart-day { font-size: 11px; color: var(--text-2); font-weight: 500; flex-shrink: 0; }
+
+    .paused-note { font-size: 12.5px; color: var(--text-3); margin-top: 14px; display: flex; align-items: center; gap: 7px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <img src="../icons/icon-48.png" width="26" height="26" style="border-radius:6px;flex-shrink:0" alt="">
+      <div><div class="name">YTSHBlock</div><div class="sub">Settings</div></div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-btn active" data-panel="general">
+        <span class="ni">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3"/>
+        </svg>
+        </span>General
+      </button>
+      <button class="nav-btn" data-panel="youtube">
+        <span class="ni"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="6" width="19" height="12" rx="3.6" stroke="currentColor" stroke-width="1.7"/><path d="M10.4 9.6l4.2 2.4-4.2 2.4z" fill="currentColor"/></svg></span>YouTube
+      </button>
+      <button class="nav-btn" data-panel="schedule">
+        <span class="ni"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>Schedule
+      </button>
+      <button class="nav-btn" data-panel="platforms">
+        <span class="ni"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg></span>Platforms
+      </button>
+      <button class="nav-btn" data-panel="stats" id="statsNavBtn" style="display:none">
+        <span class="ni"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="5" y="11" width="3.2" height="7" rx="1"/><rect x="10.4" y="6" width="3.2" height="12" rx="1"/><rect x="15.8" y="13" width="3.2" height="5" rx="1"/></svg></span>Stats
+      </button>
+      <button class="nav-btn" data-panel="about">
+        <span class="ni"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg></span>About
+      </button>
+    </nav>
+
+    <div class="sb-footer">
+      <span>Appearance</span>
+      <button class="btn ghost" id="themeBtn" style="padding:8px;border-radius:9px" title="Toggle theme">
+        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content scroll" id="content">
+
+    <!-- General -->
+    <section class="panel active" id="panel-general">
+      <div class="ph"><h1>General</h1><p>Master controls for YTSHBlock across every site.</p></div>
+      <div class="card" style="padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:26px">
+        <div class="ricon" style="width:42px;height:42px;border-radius:12px;color:var(--text)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M6.6 7a8 8 0 1 0 10.8 0"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:16px;font-weight:600;letter-spacing:-.015em">Block short-form content</div>
+          <div style="font-size:13px;color:var(--text-2);margin-top:3px" id="masterDesc">YTSHBlock is active.</div>
+        </div>
+        <button class="sw lg" id="masterSw" role="switch" aria-checked="true"></button>
+      </div>
+      <div class="sec-label" style="margin:0 2px 10px">Appearance</div>
+      <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:26px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500">Theme</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:2px">Match the look you prefer.</div>
+        </div>
+        <div class="seg" id="themeSeg">
+          <button data-theme-val="light" aria-selected="false">Light</button>
+          <button data-theme-val="dark"  aria-selected="true">Dark</button>
+        </div>
+      </div>
+      <div class="sec-label" style="margin:0 2px 10px">Tracking</div>
+      <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:16px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500">Track blocked Shorts</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:2px">Count how many Shorts YTSHBlock blocks. Data stays on your device.</div>
+        </div>
+        <button class="sw lg" id="statsSw" role="switch" aria-checked="false"></button>
+      </div>
+    </section>
+
+    <!-- YouTube -->
+    <section class="panel" id="panel-youtube">
+      <div class="ph"><h1>YouTube</h1><p>Choose exactly where Shorts disappear. Each option works independently.</p></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn ghost" id="allBtn" style="padding:6px 12px;font-size:12.5px">Turn all off</button>
+      </div>
+      <div class="card" style="padding:4px 20px;margin-bottom:22px">
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18M3 15h18M9 3v18"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+          <div class="meta"><div class="t">Hide Shorts on Home</div><div class="d">Remove the Shorts shelf from the Home feed.</div></div>
+          <button class="sw" id="homefeedSw" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M14 9.5l4 2.5-4 2.5z"/></svg></div>
+          <div class="meta"><div class="t">Hide Shorts on watch page</div><div class="d">Remove the Shorts shelf from video watch pages.</div></div>
+          <button class="sw" id="watchSw" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 6H3M16 12H3M11 18H3"/></svg></div>
+          <div class="meta"><div class="t">Hide Shorts in Subscriptions</div><div class="d">Remove Shorts videos from the Subscriptions feed.</div></div>
+          <button class="sw" id="subsSw" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/><path d="M5.5 9h1.5M5.5 12h1.5"/></svg></div>
+          <div class="meta"><div class="t">Hide the Shorts tab</div><div class="d">Takes Shorts out of the left sidebar and bottom navigation.</div></div>
+          <button class="sw" id="sidebarSw" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11a4 4 0 0 1 0 8h-3"/><path d="M9 6l-5 4 5 4"/></svg></div>
+          <div class="meta"><div class="t">Redirect Shorts to player</div><div class="d">Any youtube.com/shorts link opens in the normal watch player.</div></div>
+          <button class="sw" id="redirectSw" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg></div>
+          <div class="meta"><div class="t">Filter search results</div><div class="d">Strips the Shorts section out of search.</div></div>
+          <button class="sw" id="searchSw" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="row">
+          <div class="ricon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3"/></svg></div>
+          <div class="meta"><div class="t">Context menu</div><div class="d">Right-click menu for toggling options directly on YouTube.</div></div>
+          <button class="sw" id="menuSw" role="switch" aria-checked="true"></button>
+        </div>
+      </div>
+      <div class="paused-note" id="ytPausedNote" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg>
+        YTSHBlock is paused — turn it on in General to apply these.
+      </div>
+    </section>
+
+    <!-- Schedule -->
+    <section class="panel" id="panel-schedule">
+      <div class="ph"><h1>Schedule</h1><p>By default YTSHBlock runs all the time. Turn this on to only block Shorts during set hours.</p></div>
+      <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:22px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500">Use a schedule</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:2px" id="schedDesc">Shorts are blocked at all times.</div>
+        </div>
+        <button class="sw lg" id="schedEnableSw" role="switch" aria-checked="false"></button>
+      </div>
+      <div id="schedOptions" style="opacity:.4;pointer-events:none;transition:opacity .2s">
+        <div class="sec-label" style="margin:0 2px 10px">Active hours</div>
+        <div class="card" style="padding:18px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px">
+          <label style="font-size:13px;color:var(--text-2)">From</label>
+          <input class="time-input" type="time" id="schedFrom" value="09:00">
+          <label style="font-size:13px;color:var(--text-2)">to</label>
+          <input class="time-input" type="time" id="schedTo" value="17:00">
+        </div>
+        <div class="sec-label" style="margin:0 2px 10px">Days</div>
+        <div class="card" style="padding:16px 20px;display:flex;gap:6px">
+          <button class="day" data-day="0" aria-pressed="false">S</button>
+          <button class="day" data-day="1" aria-pressed="true">M</button>
+          <button class="day" data-day="2" aria-pressed="true">T</button>
+          <button class="day" data-day="3" aria-pressed="true">W</button>
+          <button class="day" data-day="4" aria-pressed="true">T</button>
+          <button class="day" data-day="5" aria-pressed="true">F</button>
+          <button class="day" data-day="6" aria-pressed="false">S</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Platforms -->
+    <section class="panel" id="panel-platforms">
+      <div class="ph"><h1>Platforms</h1><p>YTSHBlock starts with YouTube. More short-form feeds are on the way.</p></div>
+      <div class="card" style="padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:26px">
+        <div class="ricon" style="width:44px;height:44px;border-radius:13px;color:var(--text)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-youtube"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:15.5px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:9px">
+            YouTube <span class="chip on" id="ytActiveChip">Active</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:3px">Shorts shelf, tab, links &amp; search.</div>
+        </div>
+        <button class="sw lg" id="ytPlatSw" role="switch" aria-checked="true"></button>
+      </div>
+      <div class="sec-label" style="margin:0 2px 12px">Coming soon</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="ricon" style="width:40px;height:40px;border-radius:12px;color:var(--text)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </div>
+            <span class="chip soon">Soon</span>
+          </div>
+          <div style="font-size:14px;font-weight:600;letter-spacing:-.01em">Instagram Reels</div>
+          <!-- <button class="btn" style="padding:8px 14px;font-size:12.5px;align-self:flex-start">Notify me</button> -->
+        </div>
+        <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="ricon" style="width:40px;height:40px;border-radius:12px;color:var(--text)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </div>
+            <span class="chip soon">Soon</span>
+          </div>
+          <div style="font-size:14px;font-weight:600;letter-spacing:-.01em">Facebook Reels</div>
+          <!-- <button class="btn" style="padding:8px 14px;font-size:12.5px;align-self:flex-start">Notify me</button> -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="panel" id="panel-stats">
+      <div class="ph"><h1>Stats</h1><p>A quick read on what YTSHBlock has kept out of your day.</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+        <div class="card" style="padding:20px">
+          <div class="mono" style="font-size:34px;font-weight:500;line-height:1" id="statWeek">0</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:8px">Blocked this week</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <div class="mono" style="font-size:34px;font-weight:500;line-height:1" id="statAllTime">0</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:8px">All time</div>
+        </div>
+      </div>
+      <div class="card" style="padding:22px 22px 18px;margin-bottom:22px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">
+          <span style="font-size:13.5px;font-weight:600">Last 7 days</span>
+          <span style="font-size:12px;color:var(--text-3)">Shorts hidden</span>
+        </div>
+        <div class="chart" id="chartBars"></div>
+      </div>
+      <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:14px">
+        <div class="ricon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div>
+        <div style="flex:1">
+          <div style="font-size:13.5px;font-weight:500">Time reclaimed</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:2px">Estimated at ~38 seconds per Short avoided.</div>
+        </div>
+        <div class="mono" style="font-size:20px;font-weight:500" id="statHours">0.0<span style="font-size:12px;color:var(--text-2)"> hrs</span></div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="panel" id="panel-about">
+      <div class="ph"><h1>About</h1></div>
+      <div class="card" style="padding:26px 24px;display:flex;align-items:center;gap:18px;margin-bottom:22px">
+        <img src="../icons/icon-128.png" width="40" height="40" style="border-radius:10px;flex-shrink:0" alt="">
+        <div style="flex:1">
+          <div style="font-size:18px;font-weight:700;letter-spacing:-.02em">YTSHBlock</div>
+          <div style="font-size:13px;color:var(--text-2);margin-top:4px;line-height:1.5;max-width:380px">
+            A small tool that takes short-form video out of the sites you visit, so you stay on what you came for.
+          </div>
+        </div>
+        <span class="chip mono">v1.0.7</span>
+      </div>
+      <div class="card" style="padding:4px 20px">
+        <a class="row clickable" href="https://github.com/gravadox/YTSHBlock" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;margin:0 -8px;padding:13px 8px">
+          <div class="ricon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></div>
+          <div class="meta"><div class="t">GitHub &amp; Issues</div></div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5M19 5l-7 7M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+        </a>
+        <a class="row clickable" href="https://github.com/gravadox/YTSHBlock/blob/main/LICENSE" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;margin:0 -8px;padding:13px 8px">
+          <div class="ricon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg></div>
+          <div class="meta"><div class="t">License (MIT)</div></div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5M19 5l-7 7M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+        </a>
+        <a class="row clickable" href="https://addons.mozilla.org/firefox/addon/ytshblock/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;margin:0 -8px;padding:13px 8px">
+          <div class="ricon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+          <div class="meta"><div class="t">Rate on Firefox Add-ons</div></div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5M19 5l-7 7M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+        </a>
+        <a class="row clickable" href="https://chromewebstore.google.com/detail/ytshblock" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;margin:0 -8px;padding:13px 8px">
+          <div class="ricon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>
+          <div class="meta"><div class="t">Rate on Chrome Web Store</div></div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5M19 5l-7 7M11 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- External script (required by MV3 CSP — no inline scripts) -->
+<script src="settings.js"></script>
+</body>
+</html>

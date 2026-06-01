@@ -5,26 +5,58 @@ const optionList = ["nav", "homefeed", "channel", "subs", "menu", "searchshorts"
 browser.storage.local
   .get(optionList)
   .then((options) => {
-    console.log(options, Object.keys(options));
     if (
       options.nav === undefined ||
       !optionList.every((option) => options.hasOwnProperty(option))
     ) {
-      console.log("initializing options");
-      // initialize
+      // First run: initialize all defaults including new keys
       addonOptions = {
-        nav: true,
-        homefeed: true,
-        channel: true,
-        subs: true,
-        menu: true,
-        searchshorts: true,
-        watchshorts: true,
+        nav: true, homefeed: true, channel: true, subs: true,
+        menu: true, searchshorts: true, watchshorts: true,
+        master: true, ytEnabled: true, redirect: true, theme: 'dark',
+        statsEnabled: false, onboardingDone: false,
+        scheduleEnabled: false, scheduleConfigured: false,
+        scheduleFrom: '09:00', scheduleTo: '17:00', scheduleDays: [1, 2, 3, 4, 5],
       };
       browser.storage.local.set(addonOptions);
-    } else addonOptions = options;
+    } else {
+      addonOptions = options;
+      // Upgrade path: ensure new keys exist for users updating from older versions
+      browser.storage.local.get(['master', 'ytEnabled', 'redirect', 'theme', 'statsEnabled', 'onboardingDone', 'scheduleConfigured'])
+        .then((newKeys) => {
+          const patch = {};
+          if (newKeys.master            === undefined) patch.master            = true;
+          if (newKeys.ytEnabled         === undefined) patch.ytEnabled         = true;
+          if (newKeys.redirect          === undefined) patch.redirect          = true;
+          if (newKeys.theme             === undefined) patch.theme             = 'dark';
+          if (newKeys.statsEnabled      === undefined) patch.statsEnabled      = false;
+          if (newKeys.onboardingDone    === undefined) patch.onboardingDone    = false;
+          if (newKeys.scheduleConfigured=== undefined) patch.scheduleConfigured= false;
+          if (Object.keys(patch).length) browser.storage.local.set(patch);
+        });
+    }
+
+    // Initialize menu for the current tab on extension load/reload
+    browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+      if (tabs.length && tabs[0].url) updateContextMenu(tabs[0].url);
+    }).catch(() => {});
   })
   .catch((err) => console.error(err));
+
+// Open onboarding on first install
+browser.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason === 'install') {
+    browser.tabs.create({ url: browser.runtime.getURL('options/onboarding.html') });
+  }
+});
+
+// Also check on each startup in case onboarding wasn't completed
+// (covers developer reloads and edge cases where install event was missed)
+browser.storage.local.get('onboardingDone').then(({ onboardingDone }) => {
+  if (!onboardingDone) {
+    browser.tabs.create({ url: browser.runtime.getURL('options/onboarding.html') });
+  }
+}).catch(() => {});
 
 // format context menu
 function onCreated() {
@@ -101,22 +133,22 @@ function createContextMenu() {
 
   browser.menus.create(
     {
-      id: "check-searchshort",
+      id: "check-searchshorts",
       type: "checkbox",
       title: "Hide Shorts in Search results",
       contexts: ["all"],
-      checked: addonOptions.searchshort,
+      checked: addonOptions.searchshorts,
     },
     onCreated
   );
 
   browser.menus.create(
     {
-      id: "check-watchshort",
+      id: "check-watchshorts",
       type: "checkbox",
       title: "Hide Shorts in Watch page",
       contexts: ["all"],
-      checked: addonOptions.watchshort,
+      checked: addonOptions.watchshorts,
     },
     onCreated
   );
@@ -154,6 +186,7 @@ function removeContextMenu() {
 }
 
 function updateContextMenu(currentTabUrl) {
+  if (!addonOptions) return;
   const re = /(?:http|https):\/\/www.youtube.com\/.*/;
   const found = currentTabUrl.match(re);
   if (contextMenuState && !found) {
@@ -167,7 +200,7 @@ function updateContextMenu(currentTabUrl) {
 }
 
 // handle url change in active tab
-function handleCurrentTabUpdate(tabId, changeInfo, tabInfo) {
+function handleCurrentTabUpdate(_tabId, changeInfo, tabInfo) {
   if (tabInfo.active) updateContextMenu(changeInfo.url);
 }
 
@@ -176,7 +209,7 @@ browser.tabs.onUpdated.addListener(handleCurrentTabUpdate, {
 });
 
 // handle tab change
-function handleTabChange(activeInfo) {
+function handleTabChange(_activeInfo) {
   browser.tabs
     .query({ active: true, currentWindow: true })
     .then((tabs) => {
@@ -188,7 +221,7 @@ function handleTabChange(activeInfo) {
 browser.tabs.onActivated.addListener(handleTabChange);
 
 // handle menu options on click
-function handleContextMenuClick(info, tab) {
+function handleContextMenuClick(info, _tab) {
   // get option type
   const type = info.menuItemId.split("-")[1];
 
@@ -213,7 +246,6 @@ function handleContextMenuClick(info, tab) {
 browser.menus.onClicked.addListener(handleContextMenuClick);
 
 function handleLocalStorageChange(changes) {
-  // update options on changes from option form
   const changedItems = Object.keys(changes);
   for (const item of changedItems) {
     if (changes[item].oldValue !== changes[item].newValue) {

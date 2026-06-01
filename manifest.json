@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YTSHBlock",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "Remove YouTube Shorts",
   "homepage_url": "https://github.com/gravadox/YTSHBlock",
   "author": "Gravadox",
@@ -17,7 +17,11 @@
   "permissions": ["storage", "contextMenus", "tabs"],
 
   "background": {
-  "scripts": ["background/contextMenu.js", "background/redirectShorts.js"]
+    "scripts": [
+      "background/contextMenu.js",
+      "background/redirectShorts.js",
+      "background/stats.js"
+    ]
   },
 
   "content_scripts": [
@@ -25,6 +29,7 @@
       "matches": ["*://www.youtube.com/*"],
       "js": [
         "waitForElm.js",
+        "utils.js",
         "removeShortsDom.js",
         "removeShortSectionInChannelPage.js",
         "removeShortInSubscriptionPage.js",
@@ -48,12 +53,20 @@
   },
 
   "options_ui": {
-    "page": "options/options.html"
+    "page": "options/settings.html",
+    "open_in_tab": true
   },
-  "browser_specific_settings": {
-  "gecko": {
-    "id": "YTSHBlock@Gravadox"
-  }
-}
 
+  "web_accessible_resources": [
+    {
+      "resources": ["options/onboarding.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "YTSHBlock@Gravadox"
+    }
+  }
 }
